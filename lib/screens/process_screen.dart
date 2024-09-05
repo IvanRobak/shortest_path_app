@@ -13,6 +13,7 @@ class ProcessScreenState extends State<ProcessScreen> {
   double progress = 0.0;
   bool isLoading = true;
   bool isCompleted = false;
+  List<String> results = [];
 
   @override
   void initState() {
@@ -29,6 +30,10 @@ class ProcessScreenState extends State<ProcessScreen> {
     }
 
     setState(() {
+      results = [
+        '(0,3) -> (0,2) -> (0,1)',
+        '(0,3) -> (1,2) -> (2,3)'
+      ]; // Зразок результатів
       isLoading = false;
       isCompleted = true;
     });
@@ -85,7 +90,12 @@ class ProcessScreenState extends State<ProcessScreen> {
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).pushNamed(
+                      '/results',
+                      arguments: results,
+                    );
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 120, 187, 241),
                     padding: const EdgeInsets.symmetric(vertical: 16),

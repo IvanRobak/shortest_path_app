@@ -33,20 +33,36 @@ class CalculationProcessScreenState extends State<CalculationProcessScreen> {
         setState(() {
           responseData = jsonDecode(response.body);
         });
+
+        // Перевіряємо, чи віджет ще активний і чи є дані
+        if (mounted && responseData != null) {
+          // Переходимо на екран результатів після успішного отримання даних
+          Navigator.of(context).pushNamed(
+            '/results',
+            arguments: responseData!['results'] ??
+                [], // Якщо не null, передаємо результати
+          );
+        }
       } else {
-        setState(() {
-          errorMessage = 'Помилка отримання даних: ${response.statusCode}';
-        });
+        if (mounted) {
+          setState(() {
+            errorMessage = 'Помилка отримання даних: ${response.statusCode}';
+          });
+        }
       }
     } catch (error) {
-      setState(() {
-        errorMessage = 'Не вдалося виконати запит: $error';
-      });
+      if (mounted) {
+        setState(() {
+          errorMessage = 'Не вдалося виконати запит: $error';
+        });
+      }
     }
 
-    setState(() {
-      isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override
@@ -74,4 +90,3 @@ class CalculationProcessScreenState extends State<CalculationProcessScreen> {
     );
   }
 }
-//https://flutter.webspark.dev/flutter/api

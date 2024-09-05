@@ -21,9 +21,9 @@ class MyApp extends StatelessWidget {
       routes: {
         '/': (context) => const UrlInputScreen(),
         '/process': (context) => const CalculationProcessScreen(
-              apiUrl: '',
+              apiUrl: '', 
             ),
-        '/results': (context) => ResultsScreen(),
+        '/results': (context) => ResultListScreen(),
       },
     );
   }
