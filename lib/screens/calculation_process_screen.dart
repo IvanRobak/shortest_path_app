@@ -5,9 +5,7 @@ import 'package:http/http.dart' as http;
 class CalculationProcessScreen extends StatefulWidget {
   final String apiUrl; // Додаємо параметр apiUrl
 
-  const CalculationProcessScreen(
-      {super.key,
-      required this.apiUrl}); // Передаємо параметр через конструктор
+  const CalculationProcessScreen({super.key, required this.apiUrl});
 
   @override
   CalculationProcessScreenState createState() =>
@@ -27,7 +25,7 @@ class CalculationProcessScreenState extends State<CalculationProcessScreen> {
 
     try {
       final response = await http.get(
-        Uri.parse(widget.apiUrl), // Використовуємо переданий apiUrl
+        Uri.parse(widget.apiUrl),
         headers: {"Content-Type": "application/json"},
       );
 
@@ -35,18 +33,15 @@ class CalculationProcessScreenState extends State<CalculationProcessScreen> {
         setState(() {
           responseData = jsonDecode(response.body);
         });
-        print('Успішно отримано дані: ${response.body}');
       } else {
         setState(() {
           errorMessage = 'Помилка отримання даних: ${response.statusCode}';
         });
-        print('HTTP помилка: ${response.statusCode}, ${response.body}');
       }
     } catch (error) {
       setState(() {
         errorMessage = 'Не вдалося виконати запит: $error';
       });
-      print('Помилка запиту: $error');
     }
 
     setState(() {
