@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class CalculationProcessScreen extends StatefulWidget {
-  final String apiUrl;
-  const CalculationProcessScreen({super.key, required this.apiUrl});
+  final String apiUrl; // Додаємо параметр apiUrl
+
+  const CalculationProcessScreen(
+      {super.key,
+      required this.apiUrl}); // Передаємо параметр через конструктор
 
   @override
   CalculationProcessScreenState createState() =>
@@ -12,32 +15,38 @@ class CalculationProcessScreen extends StatefulWidget {
 }
 
 class CalculationProcessScreenState extends State<CalculationProcessScreen> {
-  double progress = 0.0;
   bool isLoading = false;
   String? errorMessage;
+  Map<String, dynamic>? responseData;
 
-  Future<void> _calculate() async {
+  Future<void> _fetchData() async {
     setState(() {
       isLoading = true;
       errorMessage = null;
     });
 
     try {
-      final response = await http.get(Uri.parse(widget.apiUrl));
+      final response = await http.get(
+        Uri.parse(widget.apiUrl), // Використовуємо переданий apiUrl
+        headers: {"Content-Type": "application/json"},
+      );
+
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
         setState(() {
-          progress = data['progress'];
+          responseData = jsonDecode(response.body);
         });
+        print('Успішно отримано дані: ${response.body}');
       } else {
         setState(() {
-          errorMessage = 'Помилка отримання даних';
+          errorMessage = 'Помилка отримання даних: ${response.statusCode}';
         });
+        print('HTTP помилка: ${response.statusCode}, ${response.body}');
       }
     } catch (error) {
       setState(() {
-        errorMessage = 'Не вдалося виконати запит';
+        errorMessage = 'Не вдалося виконати запит: $error';
       });
+      print('Помилка запиту: $error');
     }
 
     setState(() {
@@ -48,7 +57,7 @@ class CalculationProcessScreenState extends State<CalculationProcessScreen> {
   @override
   void initState() {
     super.initState();
-    _calculate();
+    _fetchData();
   }
 
   @override
@@ -57,14 +66,17 @@ class CalculationProcessScreenState extends State<CalculationProcessScreen> {
       appBar: AppBar(title: const Text('Процес виконання')),
       body: Center(
         child: isLoading
-            ? CircularProgressIndicator(value: progress)
+            ? const CircularProgressIndicator()
             : errorMessage != null
                 ? Text(errorMessage!)
-                : ElevatedButton(
-                    onPressed: _calculate,
-                    child: const Text('Send results to server'),
-                  ),
+                : responseData != null
+                    ? Text('Дані отримані: ${responseData.toString()}')
+                    : ElevatedButton(
+                        onPressed: _fetchData,
+                        child: const Text('Повторити запит'),
+                      ),
       ),
     );
   }
 }
+//https://flutter.webspark.dev/flutter/api
