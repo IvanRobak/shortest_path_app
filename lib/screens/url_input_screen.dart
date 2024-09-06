@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shortest_path_app/screens/process_screen.dart';
+import 'package:shortest_path_app/screens/calculation_process_screen.dart';
 
 class UrlInputScreen extends StatefulWidget {
   const UrlInputScreen({super.key});
@@ -20,7 +20,7 @@ class UrlInputScreenState extends State<UrlInputScreen> {
       });
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (_) => ProcessScreen(apiUrl: url),
+          builder: (_) => CalculationProcessScreen(apiUrl: url),
         ),
       );
     } else {

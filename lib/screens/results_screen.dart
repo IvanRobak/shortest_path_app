@@ -5,8 +5,7 @@ class ResultListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Перевіряємо чи отримали аргументи
-    final results = ModalRoute.of(context)!.settings.arguments as List<String>?;
+    final results = ModalRoute.of(context)?.settings.arguments as List<String>?;
 
     if (results == null || results.isEmpty) {
       return Scaffold(

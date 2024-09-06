@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class ProcessScreen extends StatefulWidget {
   final String apiUrl;
@@ -22,21 +24,48 @@ class ProcessScreenState extends State<ProcessScreen> {
   }
 
   Future<void> _startCalculations() async {
+    // Паралельно запускаємо запит до API
+    _fetchDataFromApi();
+
+    // Симулюємо прогрес від 0 до 100
     for (int i = 1; i <= 100; i++) {
       await Future.delayed(const Duration(milliseconds: 50));
       setState(() {
         progress = i.toDouble();
       });
     }
-
     setState(() {
-      results = [
-        '(0,3) -> (0,2) -> (0,1)',
-        '(0,3) -> (1,2) -> (2,3)'
-      ]; // Зразок результатів
       isLoading = false;
       isCompleted = true;
     });
+  }
+
+  Future<void> _fetchDataFromApi() async {
+    try {
+      final response = await http.get(
+        Uri.parse(widget.apiUrl),
+        headers: {"Content-Type": "application/json"},
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        setState(() {
+          final resultsData = data['data'] as List<dynamic>;
+
+          // Перетворюємо дані в рядки
+          results = resultsData.map((item) {
+            final start = item['start'];
+            final end = item['end'];
+            return 'Початок: (${start['x']}, ${start['y']}), Кінець: (${end['x']}, ${end['y']})';
+          }).toList();
+        });
+      } else {
+        throw Exception('Помилка: ${response.statusCode}');
+      }
+    } catch (error) {
+      throw Exception('Не вдалося виконати запит: $error');
+    }
   }
 
   @override
