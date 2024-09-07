@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async'; // Для таймера
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -16,6 +17,7 @@ class ProcessScreenState extends State<ProcessScreen> {
   bool isLoading = true;
   bool isCompleted = false;
   List<String> results = [];
+  Timer? _timer;
 
   @override
   void initState() {
@@ -24,19 +26,20 @@ class ProcessScreenState extends State<ProcessScreen> {
   }
 
   Future<void> _startCalculations() async {
-    // Паралельно запускаємо запит до API
-    _fetchDataFromApi();
+    _startProgressTimer();
 
-    // Симулюємо прогрес від 0 до 100
-    for (int i = 1; i <= 100; i++) {
-      await Future.delayed(const Duration(milliseconds: 50));
-      setState(() {
-        progress = i.toDouble();
-      });
-    }
-    setState(() {
-      isLoading = false;
-      isCompleted = true;
+    await _fetchDataFromApi();
+  }
+
+  void _startProgressTimer() {
+    _timer = Timer.periodic(const Duration(milliseconds: 200), (timer) {
+      if (progress < 100) {
+        setState(() {
+          progress += 1;
+        });
+      } else {
+        timer.cancel();
+      }
     });
   }
 
@@ -66,6 +69,19 @@ class ProcessScreenState extends State<ProcessScreen> {
     } catch (error) {
       throw Exception('Не вдалося виконати запит: $error');
     }
+
+    _timer?.cancel();
+
+    setState(() {
+      progress = 100;
+      isCompleted = true;
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   @override

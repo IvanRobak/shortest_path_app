@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -17,11 +18,25 @@ class CalculationProcessScreenState extends State<CalculationProcessScreen> {
   bool isLoading = true;
   bool isCompleted = false;
   List<String> results = [];
+  Timer? _timer;
 
   @override
   void initState() {
     super.initState();
+    _startProgressSimulation();
     _fetchData();
+  }
+
+  void _startProgressSimulation() {
+    _timer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
+      setState(() {
+        if (progress < 100) {
+          progress += 1;
+        } else {
+          timer.cancel();
+        }
+      });
+    });
   }
 
   Future<void> _fetchData() async {
@@ -34,14 +49,9 @@ class CalculationProcessScreenState extends State<CalculationProcessScreen> {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
 
-        // Логування отриманої відповіді для перевірки
-        print("Отримана відповідь від API: $data");
-
         setState(() {
-          // Отримуємо поле `data`, яке є списком результатів
           final resultsData = data['data'] as List<dynamic>;
 
-          // Перетворюємо кожен елемент списку на зручний формат, наприклад, як рядки
           results = resultsData.map((item) {
             final start = item['start'];
             final end = item['end'];
@@ -52,9 +62,6 @@ class CalculationProcessScreenState extends State<CalculationProcessScreen> {
           isCompleted = true;
           progress = 100;
         });
-
-        // Додаткове логування результатів
-        print("Отримані результати: $results");
       } else {
         setState(() {
           isLoading = false;
@@ -70,6 +77,12 @@ class CalculationProcessScreenState extends State<CalculationProcessScreen> {
       });
       throw Exception('Не вдалося виконати запит: $error');
     }
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
   }
 
   @override
@@ -115,7 +128,6 @@ class CalculationProcessScreenState extends State<CalculationProcessScreen> {
               ],
             ),
           ),
-          // Якщо завдання завершені, кнопка надсилання результатів
           if (isCompleted)
             Positioned(
               bottom: 30,
@@ -125,15 +137,12 @@ class CalculationProcessScreenState extends State<CalculationProcessScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    // Перевіряємо чи є результати і переходимо до екрану результатів
                     if (results.isNotEmpty) {
                       Navigator.of(context).pushNamed(
                         '/results',
-                        arguments: results, // передаємо результати
+                        arguments: results,
                       );
-                    } else {
-                      print("Результати відсутні.");
-                    }
+                    } else {}
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 120, 187, 241),
