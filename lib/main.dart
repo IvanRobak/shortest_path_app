@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shortest_path_app/screens/calculation_process_screen.dart';
+import 'package:shortest_path_app/screens/result_grid_screen.dart';
 import 'package:shortest_path_app/screens/results_screen.dart';
 import 'package:shortest_path_app/screens/url_input_screen.dart';
 
@@ -24,6 +25,7 @@ class MyApp extends StatelessWidget {
               apiUrl: '',
             ),
         '/results': (context) => const ResultListScreen(),
+        '/preview': (context) => const ResultGridScreen(field: []),
       },
     );
   }

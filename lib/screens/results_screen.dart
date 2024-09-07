@@ -29,38 +29,23 @@ class ResultListScreen extends StatelessWidget {
             child: ListTile(
               title: Text(result),
               onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => ResultDetailScreen(result: result),
-                  ),
+                Navigator.of(context).pushNamed(
+                  '/preview',
+                  arguments: {
+                    'field': [
+                      ['empty', 'empty', 'empty', 'start'],
+                      ['path', 'empty', 'empty', 'blocked'],
+                      ['path', 'empty', 'end', 'blocked'],
+                      ['path', 'empty', 'empty', 'empty'],
+                    ], 
+                    'path':
+                        '(0,3)->(0,2)->(0,1)', 
+                  },
                 );
               },
             ),
           );
         },
-      ),
-    );
-  }
-}
-
-class ResultDetailScreen extends StatelessWidget {
-  final String result;
-
-  const ResultDetailScreen({super.key, required this.result});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Result detail'),
-        backgroundColor: Colors.blue,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Text(
-          'Details about the result: $result',
-          style: const TextStyle(fontSize: 18),
-        ),
       ),
     );
   }
